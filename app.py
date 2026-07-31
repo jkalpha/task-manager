@@ -11,7 +11,17 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 @app.route("/health", methods=["GET"])
-def health_status():
+def HealthStatus():
+    """
+    Checks the health of the api connection.
+
+    Args: 
+        "/health" - Directory path in the site folder.
+        methods=["GET"] - HTTP method used to retrieve resources from the server
+
+    Returns: JSON of the status with 200 code "successful"
+
+    """
     return jsonify({"status": "ok"}, 200)
 
 if __name__ == "__main__":
