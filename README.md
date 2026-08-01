@@ -41,9 +41,9 @@
     - [x] Run the app locally and confirm JSON responses work
 
 - [ ] **Step 2 — In-memory tasks** *(no database yet)*
-    - [ ] Store tasks in a Python list or dict
-    - [ ] `POST /tasks` — create a task
-    - [ ] `GET /tasks` — list all tasks
+    - [x] Store tasks in a Python list or dict
+    - [x] `POST /tasks` — create a task
+    - [x] `GET /tasks` — list all tasks
     - [ ] `GET /tasks/<id>` — get one task
     - [ ] `PUT /tasks/<id>` — update a task
     - [ ] `DELETE /tasks/<id>` — delete a task
