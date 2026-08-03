@@ -1,6 +1,6 @@
 # Task Manager API
 
-A user-scoped task API built as Project 1 of the backend junior roadmap. The
+A task API built as a project to learn backend . The
 goal is not just CRUD: this project practices API hygiene, security, and testing
 discipline in a small, explainable backend service.
 
@@ -36,7 +36,7 @@ own tasks. Tasks include a title, description, category, and completion status.
 ## Delivery checklist
 
 - [x] `GET /health` returns `{"status": "ok"}`
-- [x] Basic in-memory `GET /tasks` and `POST /tasks` routes
+- [x] Basic in-memory `CRUD`routes
 - [ ] SQLite schema and migrations/setup for `users` and `tasks`
 - [ ] Full user-scoped task CRUD
 - [ ] Signup, login, password hashing, and JWT protection
