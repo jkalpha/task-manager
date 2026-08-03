@@ -50,6 +50,16 @@ def AddTasks():
     return jsonify(new_task), 201
 
 # TODO: Implement GET /tasks by id
+@app.route("/tasks/<int: id>", methods=["PUT"])
+def SingleTask(id):
+    data = request.get_json
+    if "title" in data:
+        # access the information at id
+        return jsonify{}
+    return jsonify({"title": 0}), 400
+
+
+
 # TODO: Implement PUT /tasks
 # TODO: Implement DELETE /tasks
 
@@ -58,6 +68,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 """
--add sections to implement from chat
 -commit
 """

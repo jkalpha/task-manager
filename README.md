@@ -1,108 +1,84 @@
-## task-manager
-### task manager api - python application
+# Task Manager API
 
-**simple overview**: simple api to manage tasks. users can create, update, and organize tasks securely with user login. building to learn how to handle databases and secure user access.
+A user-scoped task API built as Project 1 of the backend junior roadmap. The
+goal is not just CRUD: this project practices API hygiene, security, and testing
+discipline in a small, explainable backend service.
 
-**technologies used**
+## Project scope
 
-- Python (Flask Framework)
-- SQLite (Database)
-- JWT Authentication
-- RESTful API Design
-- CRUD Operations
-- User Authentication
+**Stack:** Python, Flask, SQLite, JWT authentication, and pytest.
 
+The API will let authenticated users create, read, update, and delete only their
+own tasks. Tasks include a title, description, category, and completion status.
 
-**api responsibilities:**
+### Core API
 
-- [ ] *User Management*:
-    - Sign up and log in to get a JWT token.
-    - Secure API with JWT.
+- User signup and login, with securely hashed passwords
+- JWT-protected task routes
+- Create, list, retrieve, update, and delete user-scoped tasks
+- Filter a user's tasks by completion status and category
+- Consistent validation and error responses:
+  - `400 Bad Request` for invalid or missing input
+  - `401 Unauthorized` for missing, invalid, or expired tokens
+  - `404 Not Found` for a task that does not exist or does not belong to the user
+  - `500 Internal Server Error` only for unexpected server failures
 
-- [ ] *Task Management*:
-    - Create tasks (title, description, category).
-    - View all tasks or filter by status/category.
-    - Update or delete tasks by ID.
+### Quality and security requirements
 
-- [ ] *Task Operations (CRUD)*:
-    - Create a new task: Allow users to add a task with a title, description, and optional category (e.g., work, personal).
-    - Read tasks:
-        - Return all tasks belonging to the authenticated user.
-        - Filter by status (e.g., completed or pending) or category.
-        - Retrieve a single task by its ID.
-        - Update a task: Modify task details (title, description, category) or mark it as completed/pending using its ID.
-        - Delete a task: Remove a task based on its ID.
+- Unit tests for business logic, not only successful HTTP responses
+- Integration tests against real API endpoints and a separate test database
+- Coverage for empty input, duplicate emails, expired tokens, malformed task IDs,
+  and attempts to access another user's task
+- Rate limiting on the login endpoint (in-memory first; Redis is an optional
+  extension)
+- Parameterized SQL queries for every database operation
 
+## Delivery checklist
 
-**learning pathway** *(build manually, layer by layer)*
+- [x] `GET /health` returns `{"status": "ok"}`
+- [x] Basic in-memory `GET /tasks` and `POST /tasks` routes
+- [ ] SQLite schema and migrations/setup for `users` and `tasks`
+- [ ] Full user-scoped task CRUD
+- [ ] Signup, login, password hashing, and JWT protection
+- [ ] Input validation and documented error responses
+- [ ] Login rate limiter
+- [ ] Unit and integration test suites using a test database
+- [ ] README decision notes and scale trade-offs
 
-- [x] **Step 1 — Hello Flask** *(no database, no auth)*
-    - [x] Add a health route: `GET /health` → `{"status": "ok"}`
-    - [x] Run the app locally and confirm JSON responses work
+## Suggested build sequence
 
-- [ ] **Step 2 — In-memory tasks** *(no database yet)*
-    - [x] Store tasks in a Python list or dict
-    - [x] `POST /tasks` — create a task
-    - [x] `GET /tasks` — list all tasks
-    - [ ] `GET /tasks/<id>` — get one task
-    - [ ] `PUT /tasks/<id>` — update a task
-    - [ ] `DELETE /tasks/<id>` — delete a task
-    - [ ] Notice: data is lost on restart; no user isolation yet
+1. Finish in-memory CRUD so each route's behavior is clear.
+2. Move tasks to SQLite using parameterized queries.
+3. Add users, password hashing, and `user_id` ownership on tasks.
+4. Add JWT issuance and protect every task route.
+5. Add filters, validation, and precise error handling.
+6. Add rate limiting and tests for normal and failure paths.
 
-- [ ] **Step 3 — SQLite manually** *(built-in `sqlite3`, no ORM)*
-    - [ ] Create `tasks.db` and a `tasks` table with SQL
-    - [ ] Use parameterized queries for all CRUD operations
-    - [ ] Wire SQLite into the existing task routes
+## Schema decisions
 
-- [ ] **Step 4 — Users** *(still no JWT)*
-    - [ ] Create a `users` table (id, username, password_hash)
-    - [ ] Signup: hash passwords with `werkzeug.security.generate_password_hash`
-    - [ ] Login: verify with `check_password_hash`
-    - [ ] Return a simple login response (e.g. user id), not a token yet
+The planned schema separates `users` from `tasks` and links each task with a
+`user_id` foreign key. This keeps ownership enforceable at the query layer and
+prevents task data from being shared accidentally between accounts. An index on
+`tasks.user_id` supports the main access pattern: listing one user's tasks.
 
-- [ ] **Step 5 — Scope tasks to users**
-    - [ ] Add `user_id` to the tasks table
-    - [ ] Filter every task query by the logged-in user
-    - [ ] Confirm users cannot access each other's tasks
+## What I would change at scale
 
-- [ ] **Step 6 — JWT auth**
-    - [ ] Issue a JWT on successful login
-    - [ ] Protect task routes with `Authorization: Bearer <token>`
-    - [ ] Decode the token to get `user_id` on each request
-    - [ ] Reject requests with missing or invalid tokens
+SQLite and an in-memory login limiter are appropriate for learning and local
+development. At larger scale, I would move to PostgreSQL, run database migrations
+as part of deployment, store rate-limit counters in Redis, add pagination to task
+listing, and use structured logging and monitoring.
 
-- [ ] **Step 7 — Filters and polish**
-    - [ ] Filter tasks by status (completed / pending)
-    - [ ] Filter tasks by category
-    - [ ] Mark tasks completed or pending via update
+## Running locally
 
-
-**packages by phase**
-
-| Phase | Packages |
-|-------|----------|
-| Steps 1–3 | `Flask` only |
-| Step 4 | `Flask` + Werkzeug *(included with Flask)* |
-| Step 6 | Add `PyJWT` or `Flask-JWT-Extended` |
-
-Skip Flask-SQLAlchemy until raw SQL feels comfortable — then rebuild with an ORM to see what it automates.
-
-
-**suggested folder structure** *(keep flat at first)*
-
-```
-task-manager/
-├── app.py          # routes + app setup
-├── db.py           # sqlite connection helpers
-├── auth.py         # signup, login, jwt helpers
-├── requirements.txt
-└── tasks.db        # created at runtime
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
 ```
 
+## Definition of done
 
-**self-check** *(can you explain these without looking at code?)*
-
-- [ ] What happens when I hit `POST /tasks`?
-- [ ] Where is the password stored, and in what form?
-- [ ] How does the server know which user's tasks to return?
-- [ ] What breaks if I send a request without a token?
+From a clean checkout, I can create the database, run the full test suite green,
+and explain the schema, authentication flow, validation behavior, and at least one
+trade-off I would make differently in production.
