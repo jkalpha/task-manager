@@ -6,7 +6,6 @@ Date:      2026-07-30
 
 Description: application built to learn how apis work
 """
-
 from flask import Flask, jsonify, request
 app = Flask(__name__)
 
@@ -20,6 +19,8 @@ tasks = [
         {"id": 5, "title": "work on mle unit 9", "completed": False},
         {"id": 6, "title": "java 1", "completed": False}
     ]
+
+# Importing data into tables:
 
 
 @app.route("/health", methods=["GET"])

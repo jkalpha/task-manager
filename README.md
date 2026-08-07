@@ -1,6 +1,6 @@
 # Task Manager API
 
-A task API built as a project to learn backend . The
+A task API built as a project to learn backend. The
 goal is not just CRUD: this project practices API hygiene, security, and testing
 discipline in a small, explainable backend service.
 
