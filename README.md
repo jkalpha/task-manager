@@ -37,7 +37,7 @@ own tasks. Tasks include a title, description, category, and completion status.
 
 - [x] `GET /health` returns `{"status": "ok"}`
 - [x] Basic in-memory `CRUD`routes
-- [ ] SQLite schema and migrations/setup for `users` and `tasks`
+- 1/2[x] SQLite schema and migrations/setup for `users` and `tasks` **need to add users**
 - [ ] Full user-scoped task CRUD
 - [ ] Signup, login, password hashing, and JWT protection
 - [ ] Input validation and documented error responses
