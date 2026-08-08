@@ -22,7 +22,7 @@ try:
             name VARCHAR (60)    
         )
     """)
-    
+
     # Importing data into tables to add persistence:
     # for task in tasks:
     #     cursor.execute(
@@ -30,6 +30,7 @@ try:
     #         (task["id"], task["title"], int(task["completed"]))
     #     )
     
+    # 
     connection.commit()
 
 except sqweel.Error as error:
