@@ -55,7 +55,7 @@ def get_tasks_all() -> list:
 
     return [dict(row) for row in rows ]
 
-def get_tasks_id(id: int) -> list:
+def get_tasks_id(task_id: int) -> list:
     """
     Retrieves tasks by id from the tasks table.
 
@@ -68,7 +68,7 @@ def get_tasks_id(id: int) -> list:
         conn.row_factory = sqweel.Row
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM tasks WHERE id = ?", (id,))
+        cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
 
         rows = cursor.fetchall()
     return [dict(row) for row in rows]
@@ -100,6 +100,24 @@ def update_completion(task: dict):
     print("UPDATED")
     print(f"Task: {task["id"]}, completed: {task["completed"]}")
     conn.close()
+
+
+def remove_tasks(task_id: int):
+    conn = connect_db()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM tasks WHERE id = ?",
+            (task_id,)
+        )
+        conn.commit()
+        return cursor.rowcount > 0
+        
+    except sqweel.Error as error:
+        print(f"An error occured: {error}" )
+    
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     initialize_db()

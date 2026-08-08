@@ -41,11 +41,11 @@ own tasks. Tasks include a title, description, category, and completion status.
 
 - [x] SQLite schema and migrations/setup for `users` and `tasks`
 
-- [ ] Full user-scoped task CRUD
+- [x] Full user-scoped task CRUD
   - [x] GET
   - [x] POST
-  - [ ] PUT
-  - [ ] DELETE
+  - [x] PUT
+  - [x] DELETE
 
 - [ ] Signup, login, password hashing, and JWT protection
 

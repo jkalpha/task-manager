@@ -6,6 +6,7 @@ Date:      2026-07-30
 
 Description: application built to learn how apis work
 """
+# TODO: Update Docstring for db and not list
 import database as db
 
 from flask import Flask, jsonify, request
@@ -101,6 +102,7 @@ def AddTasks():
 """
                 ~~PUT~~
 """
+# TODO: 
 @app.route("/tasks/<int:task_id>", methods=["PUT"])
 def UpdateTask(task_id):
     """
@@ -137,13 +139,8 @@ def RemoveTask(task_id: int):
              removed. If tasks doesn't exist, throws an
              error
     """
-    for task in tasks:
-        if task["id"] == task_id:
-            tasks.remove(task)
-            status = f"{task["title"]} was removed."
-            tasks.pop()
-            # Explore 204 No content
-            return jsonify(status), 200
+    if db.remove_tasks(task_id):
+        return "", 204
     return jsonify({"error": "Task not found"}), 404
 
 
