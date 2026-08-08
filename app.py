@@ -113,17 +113,15 @@ def UpdateTask(task_id):
     """
     data = request.get_json()
 
-    for task in tasks:
-        if task["id"] == task_id:
-            if "title" in data:
-                task["title"] = data["title"]
-            if "completed" in data:
-                task["completed"] = data["completed"]
-            return jsonify(task), 200
+    if "completed" in data:
+        parse_task = {
+            "id": task_id,
+            "completed": data["completed"]
+        }
+        db.update_completion(parse_task)
+        return jsonify(parse_task), 200
 
     return jsonify({"error": "Task not found"}), 404
-
-
 
 """
                 ~~DELETE~~

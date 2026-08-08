@@ -87,5 +87,19 @@ def create_tasks(new_task: dict):
     conn.close()
     return cursor.lastrowid
 
+def update_completion(task: dict):
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "UPDATE tasks SET completed = ? WHERE id = ?",
+        ((1 if task["completed"] else 0), task["id"])
+    )
+
+    conn.commit()
+    print("UPDATED")
+    print(f"Task: {task["id"]}, completed: {task["completed"]}")
+    conn.close()
+
 if __name__ == "__main__":
     initialize_db()
