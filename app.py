@@ -6,21 +6,21 @@ Date:      2026-07-30
 
 Description: application built to learn how apis work
 """
+import database as db
+
 from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 
 # Non persistent task list used to test CRUD
-tasks = [
-        {"id": 1, "title": "workout", "completed": False},
-        {"id": 2, "title": "study", "completed": False},
-        {"id": 3, "title": "budget", "completed": True},
-        {"id": 4, "title": "email Sara", "completed": False},
-        {"id": 5, "title": "work on mle unit 9", "completed": False},
-        {"id": 6, "title": "java 1", "completed": False}
-    ]
-
-# Importing data into tables:
+# tasks = [
+#         {"id": 1, "title": "workout", "completed": False},
+#         {"id": 2, "title": "study", "completed": False},
+#         {"id": 3, "title": "budget", "completed": True},
+#         {"id": 4, "title": "email Sara", "completed": False},
+#         {"id": 5, "title": "work on mle unit 9", "completed": False},
+#         {"id": 6, "title": "java 1", "completed": False}
+#     ]
 
 
 @app.route("/health", methods=["GET"])
@@ -47,8 +47,24 @@ def GetTasks():
 
     Returns: All tasks
     """
-    return jsonify(tasks)
+    return jsonify(db.get_tasks_all())
 
+# TODO: Implement with db and include user
+@app.route("/tasks/<int:task_id>", methods=["GET"])
+def tasks_by_id(task_id: int):
+    """
+    Retrieves an exixting task according to it's id
+
+    Args: task_id: int - id associated with existing task
+
+    Returns: JSON of the full contents of task associated
+             with the id and throws an error if the task
+             doesn't exist
+    """
+    task = db.get_tasks_id(task_id)
+    if task:
+        return jsonify(task), 200
+    return jsonify({"error": "Task not found"})
 
 # TODO: Handle a missing title
 @app.route("/tasks", methods=["POST"])
@@ -94,23 +110,6 @@ def UpdateTask(task_id):
                 task["completed"] = data["completed"]
             return jsonify(task), 200
 
-    return jsonify({"error": "Task not found"}), 404
-
-
-@app.route("/tasks/<int:task_id>", methods=["GET"])
-def SingleTask(task_id: int):
-    """
-    Retrieves an exixting task according to it's id
-
-    Args: task_id: int - id associated with existing task
-
-    Returns: JSON of the full contents of task associated
-             with the id and throws an error if the task
-             doesn't exist
-    """
-    for task in tasks:
-        if task["id"] == task_id:
-            return jsonify(task), 200
     return jsonify({"error": "Task not found"}), 404
 
 
