@@ -36,13 +36,25 @@ own tasks. Tasks include a title, description, category, and completion status.
 ## Delivery checklist
 
 - [x] `GET /health` returns `{"status": "ok"}`
+
 - [x] Basic in-memory `CRUD`routes
-- 1/2[x] SQLite schema and migrations/setup for `users` and `tasks` **need to add users**
+
+- [x] SQLite schema and migrations/setup for `users` and `tasks`
+
 - [ ] Full user-scoped task CRUD
+  - [x] GET
+  - [x] POST
+  - [ ] PUT
+  - [ ] DELETE
+
 - [ ] Signup, login, password hashing, and JWT protection
+
 - [ ] Input validation and documented error responses
+
 - [ ] Login rate limiter
+
 - [ ] Unit and integration test suites using a test database
+
 - [ ] README decision notes and scale trade-offs
 
 ## Suggested build sequence

@@ -7,13 +7,12 @@ def connect_db():
     """Helper function that opens the database connection."""
     return sqweel.connect("task_manager.db")
 
-def initialize_db():
+def initialize_db() -> None:
     """Initializes schema with tasks and user tables."""
     conn = connect_db()
-    # with connect_db() as conn:
     try:
         cursor = conn.cursor()
-        # Create tasks table
+        # Create tasks table        
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS tasks(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +44,8 @@ def initialize_db():
     finally:
         conn.close()
 
-def get_tasks_all():
+def get_tasks_all() -> list:
+    """Retrieves all tasks from the database."""
     with connect_db() as conn:
         conn.row_factory = sqweel.Row
         cursor = conn.cursor()
@@ -55,7 +55,15 @@ def get_tasks_all():
 
     return [dict(row) for row in rows ]
 
-def get_tasks_id(id: int):
+def get_tasks_id(id: int) -> list:
+    """
+    Retrieves tasks by id from the tasks table.
+
+    Args: id: int - id associated with tasks
+
+    Returns: list of dictionaries containing rows with attribute name keys and
+             instance value pairs.
+    """
     with connect_db() as conn:
         conn.row_factory = sqweel.Row
         cursor = conn.cursor()
@@ -64,6 +72,20 @@ def get_tasks_id(id: int):
 
         rows = cursor.fetchall()
     return [dict(row) for row in rows]
+
+def create_tasks(new_task: dict):
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute( 
+     "INSERT INTO tasks (title, completed) VALUES (?,?)",
+     (new_task["title"], new_task["completed"]) 
+     )
+
+    conn.commit()
+    print(f"{new_task["title"]} was added")
+    conn.close()
+    return cursor.lastrowid
 
 if __name__ == "__main__":
     initialize_db()

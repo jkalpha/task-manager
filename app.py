@@ -23,6 +23,9 @@ app = Flask(__name__)
 #     ]
 
 
+"""
+                ~~GET~~
+"""
 @app.route("/health", methods=["GET"])
 def HealthStatus():
     """
@@ -49,6 +52,7 @@ def GetTasks():
     """
     return jsonify(db.get_tasks_all())
 
+
 # TODO: Implement with db and include user
 @app.route("/tasks/<int:task_id>", methods=["GET"])
 def tasks_by_id(task_id: int):
@@ -64,9 +68,13 @@ def tasks_by_id(task_id: int):
     task = db.get_tasks_id(task_id)
     if task:
         return jsonify(task), 200
-    return jsonify({"error": "Task not found"})
+    return jsonify({"error": "Task not found"}), 404
 
-# TODO: Handle a missing title
+
+"""
+                ~~POST~~
+"""
+# TODO: Handle a missing title and duplicates
 @app.route("/tasks", methods=["POST"])
 def AddTasks():
     """
@@ -81,15 +89,18 @@ def AddTasks():
     data = request.get_json()
     if "title" in data:
         new_task = {
-        "id": int(tasks[-1].get("id", 0) + 1),
         "title": data["title"],
         "completed": False
     }
-        tasks.append(new_task)
+        new_id = db.create_tasks(new_task)
+        new_task["id"] = new_id
         return jsonify(new_task), 201
     return jsonify({"error": "Task need 'title'"}), 404
 
 
+"""
+                ~~PUT~~
+"""
 @app.route("/tasks/<int:task_id>", methods=["PUT"])
 def UpdateTask(task_id):
     """
@@ -113,6 +124,10 @@ def UpdateTask(task_id):
     return jsonify({"error": "Task not found"}), 404
 
 
+
+"""
+                ~~DELETE~~
+"""
 @app.route("/tasks/<int:task_id>", methods=["DELETE"])
 def RemoveTask(task_id: int):
     """
