@@ -11,10 +11,12 @@ import database as db
 
 from flask import Flask, jsonify, request
 
-def create_app() -> Flask:
+def create_app(test_config=None) -> Flask:
     app = Flask(__name__)
     app.config.from_mapping({"DATABASE": "task_manager.db"})
-
+    
+    if test_config:
+        app.config.update(test_config)
     # Non persistent task list used to test CRUD
     # tasks = [
     #         {"id": 1, "title": "workout", "completed": False},
@@ -57,7 +59,7 @@ def create_app() -> Flask:
 
     # TODO: Implement with db and include user
     @app.route("/tasks/<int:task_id>", methods=["GET"])
-    def tasks_by_id(task_id: int):
+    def get_tasks_by_id(task_id: int):
         """
         Retrieves an exixting task according to it's id
 
@@ -88,7 +90,7 @@ def create_app() -> Flask:
                 thorws an error if the task doesn't have
                 a title
         """
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         if "title" in data:
             new_task = {
             "title": data["title"],
@@ -97,7 +99,7 @@ def create_app() -> Flask:
             new_id = db.create_tasks(new_task)
             new_task["id"] = new_id
             return jsonify(new_task), 201
-        return jsonify({"error": "Task need 'title'"}), 404
+        return jsonify({"error": "Task need 'title'"}), 400
 
 
     """
@@ -114,7 +116,7 @@ def create_app() -> Flask:
         Returns: JSON of the full content of task associated with the id
                 if it exists else throw an error
         """
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
 
         if "completed" in data:
             parse_task = {
