@@ -1,5 +1,4 @@
 .env
 .venv
-.opencode
-__pychache__
+__pycache__
 workflow.excalidraw.png
