@@ -29,7 +29,7 @@ def create_app() -> Flask:
                     ~~GET~~
     """
     @app.route("/health", methods=["GET"])
-    def HealthStatus():
+    def health_status():
         """
         Checks the health of the api connection.
 
@@ -44,7 +44,7 @@ def create_app() -> Flask:
 
 
     @app.route("/tasks", methods=["GET"])
-    def GetTasks():
+    def get_tasks():
         """
         Retrieves all tasks.
 
@@ -78,7 +78,7 @@ def create_app() -> Flask:
     """
     # TODO: Handle a missing title and duplicates
     @app.route("/tasks", methods=["POST"])
-    def AddTasks():
+    def add_task():
         """
         Adds a new task to the list and assigns an id.
 
@@ -105,7 +105,7 @@ def create_app() -> Flask:
     """
     # TODO: 
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
-    def UpdateTask(task_id):
+    def update_task(task_id):
         """
         This funciton updates tasks according to id.
 
@@ -130,7 +130,7 @@ def create_app() -> Flask:
                     ~~DELETE~~
     """
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
-    def RemoveTask(task_id: int):
+    def remove_task(task_id: int):
         """
         Removes a task from the list
 
