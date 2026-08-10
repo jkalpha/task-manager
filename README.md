@@ -52,7 +52,6 @@ own tasks. Tasks include a title, description, category, and completion status.
   - [ ] login + JWT issuance
   - [ ] protecting routes + ownership
 
-
 - [ ] Input validation and documented error responses
 
 - [ ] Login rate limiter

@@ -20,23 +20,23 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         app.config.update(test_config)
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    #             NON-PERSISTENT IMPLEMENTATION FOR INITIAL CRUD
-    # tasks = [
-    #         {"id": 1, "title": "workout", "completed": False},
-    #         {"id": 2, "title": "study", "completed": False},
-    #         {"id": 3, "title": "budget", "completed": True},
-    #         {"id": 4, "title": "email Sara", "completed": False},
-    #         {"id": 5, "title": "work on mle unit 9", "completed": False},
-    #         {"id": 6, "title": "java 1", "completed": False}
-    #     ]
+    #             NON-PERSISTENT IMPLEMENTATION FOR INITIAL CRUD            #
+    # tasks = [                                                             #
+    #         {"id": 1, "title": "workout", "completed": False},            #
+    #         {"id": 2, "title": "study", "completed": False},              #
+    #         {"id": 3, "title": "budget", "completed": True},              #
+    #         {"id": 4, "title": "email Sara", "completed": False},         #
+    #         {"id": 5, "title": "work on mle unit 9", "completed": False}, #
+    #         {"id": 6, "title": "java 1", "completed": False}              #
+    #     ]                                                                 #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
     """
                     ~~GET~~
     """
     @app.route("/health", methods=["GET"])
     def health_status():
-        """
-        Checks the health of the API connection.
+        """Checks the health of the API connection.
 
         :param "/health": Directory path in the site folder.
         :param methods: (optional)["GET"], HTTP method used to retrieve resources from the server.
@@ -47,8 +47,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
     @app.route("/tasks", methods=["GET"])
     def get_tasks():
-        """
-        Retrieves all tasks.
+        """Retrieves all tasks.
 
         :return: All tasks stored in database.
         """
@@ -58,8 +57,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     # TODO: Implement using user_id
     @app.route("/tasks/<int:task_id>", methods=["GET"])
     def get_tasks_by_id(task_id: int):
-        """
-        Retrieves an exixting task according to it's id (TASK TABLE).
+        """Retrieves an exixting task according to it's id (TASK TABLE).
 
         :param task_id: int, id associated with existing task.
         :return: JSON of the full contents of task associated
@@ -78,8 +76,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     # TODO: Handle a missing title and duplicates
     @app.route("/tasks", methods=["POST"])
     def add_task():
-        """
-        Adds a new task to the tasks table and assigns an id.
+        """Adds a new task to the tasks table and assigns an id.
 
         :return: JSON of content for newly added task,
             thorws error if the task doesn't have a title.
@@ -97,9 +94,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     
     @app.route("/signup", methods=["POST"])
     def create_user():
-        """
-        Creates a new user with email and password where
-        the passoword is hashed for secure storage.
+        """Creates a new user with email and password.
 
         :return: JSON verifiying that user was added successfully.
         """
@@ -122,8 +117,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     # TODO: 
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     def update_task(task_id):
-        """
-        Updates tasks according to id.
+        """Updates tasks according to id.
 
         :param task_id: int, id associated with existing task.
         :return: JSON of the full content of task associated with the id
@@ -146,8 +140,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
     def remove_task(task_id: int):
-        """
-        Removes a task from the tasks table in the database.
+        """Removes a task from the tasks table in the database.
 
         :param task_id: int, id associate with existing task.
         :return: JSON verifying that the task was sucessfully
