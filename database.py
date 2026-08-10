@@ -28,7 +28,6 @@ def initialize_db() -> None:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR(60) NOT NULL,
                 email VARCHAR NOT NULL UNIQUE,
                 password_hash VARCHAR NOT NULL
             )
@@ -149,11 +148,16 @@ def create_user(email, password_hash) -> None:
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO users(email, password_hash), VALUES(?,?)",
+        "INSERT INTO users(email, password_hash) VALUES(?,?)",
         (email, password_hash)
     )
     conn.commit()
     conn.close()
 
 if __name__ == "__main__":
-    initialize_db()
+    # initialize_db()
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("ALTER TABLE users DROP COLUMN name")
+    conn.commit()
+    conn.close()
