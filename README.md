@@ -48,6 +48,10 @@ own tasks. Tasks include a title, description, category, and completion status.
   - [x] DELETE
 
 - [ ] Signup, login, password hashing, and JWT protection
+  - [ ] hashed passwords + sigup
+  - [ ] login + JWT issuance
+  - [ ] protecting routes + ownership
+
 
 - [ ] Input validation and documented error responses
 

@@ -1,4 +1,5 @@
 import sqlite3 as sqweel
+from werkzeug.security import generate_password_hash, check_password_hash
 #from app import tasks
 
 DB_PATH = "task_manager.db"
@@ -24,7 +25,9 @@ def initialize_db() -> None:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR (60)    
+                name VARCHAR(60) NOT NULL,
+                email VARCHAR NOT NULL UNIQUE,
+                password_hash VARCHAR NOT NULL
             )
         """)
 
@@ -118,6 +121,17 @@ def remove_tasks(task_id: int):
     
     finally:
         conn.close()
+
+def create_user(email, password_hash) -> None:
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO users(email, password_hash), VALUES(?,?)",
+        (email, password_hash)
+    )
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
     initialize_db()

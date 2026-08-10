@@ -10,6 +10,7 @@ Description: application built to learn how apis work
 import database as db
 
 from flask import Flask, jsonify, request
+from werkzeug.security import generate_password_hash
 
 def create_app(test_config=None) -> Flask:
     app = Flask(__name__)
@@ -100,7 +101,21 @@ def create_app(test_config=None) -> Flask:
             new_task["id"] = new_id
             return jsonify(new_task), 201
         return jsonify({"error": "Task need 'title'"}), 400
-
+    
+    @app.route("/signup", methods=["POST"])
+    def create_user():
+        data = request.get_json(silent=True) or {}
+        email = data.get("email")
+        password = str(data.get("password"))
+        
+        if email and password:
+            password_hash = generate_password_hash(password)
+            # TODO: Check if the email already exists
+            # test with: c.post("/signup", json={"email": "a@b.com", "password": "hunter2"})
+            db.create_user(email=email, password_hash=password_hash)
+            status = "user successfully created"
+            return jsonify(status), 201
+        return jsonify({"error": "Invalid operation"}), 400
 
     """
                     ~~PUT~~
