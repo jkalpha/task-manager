@@ -42,16 +42,8 @@ own tasks. Tasks include a title, description, category, and completion status.
 - [x] SQLite schema and migrations/setup for `users` and `tasks`
 
 - [x] Full user-scoped task CRUD
-  - [x] GET
-  - [x] POST
-  - [x] PUT
-  - [x] DELETE
 
 - [ ] Signup, login, password hashing, and JWT protection
-  - [x] hashed passwords + sigup
-      - [x] create test_client
-      - [x] write get_user_by_email(email)
-      - [x] drop the name 
   - [ ] login + JWT issuance
   - [ ] protecting routes + ownership
 

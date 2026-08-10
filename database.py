@@ -164,7 +164,7 @@ def get_user_by_email(email):
     row = cursor.fetchone()
     # TODO: is there a better way to do this?
     if row:
-        return row[1]
+        return dict(row)
     return None
 
 if __name__ == "__main__":
