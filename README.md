@@ -48,7 +48,10 @@ own tasks. Tasks include a title, description, category, and completion status.
   - [x] DELETE
 
 - [ ] Signup, login, password hashing, and JWT protection
-  - [ ] hashed passwords + sigup
+  - [x] hashed passwords + sigup
+      - [x] create test_client
+      - [x] write get_user_by_email(email)
+      - [x] drop the name 
   - [ ] login + JWT issuance
   - [ ] protecting routes + ownership
 

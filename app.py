@@ -100,12 +100,12 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
-        password = str(data.get("password"))
+        password = data.get("password")
         
         if email and password:
+            if db.get_user_by_email(email):
+                return jsonify({"error": "Email already exits"}), 409
             password_hash = generate_password_hash(password)
-            # TODO: Check if the email already exists
-            # test with: c.post("/signup", json={"email": "a@b.com", "password": "hunter2"})
             db.create_user(email=email, password_hash=password_hash)
             status = "user successfully created"
             return jsonify(status), 201
@@ -114,7 +114,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
                     ~~PUT~~
     """
-    # TODO: 
+
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     def update_task(task_id):
         """Updates tasks according to id.

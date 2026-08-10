@@ -154,10 +154,18 @@ def create_user(email, password_hash) -> None:
     conn.commit()
     conn.close()
 
-if __name__ == "__main__":
-    # initialize_db()
+def get_user_by_email(email):
     conn = connect_db()
     cursor = conn.cursor()
-    cursor.execute("ALTER TABLE users DROP COLUMN name")
-    conn.commit()
-    conn.close()
+    cursor.execute(
+        "SELECT * FROM users WHERE email = ?",
+        (email,)
+    )
+    row = cursor.fetchone()
+    # TODO: is there a better way to do this?
+    if row:
+        return row[1]
+    return None
+
+if __name__ == "__main__":
+    initialize_db()
