@@ -12,13 +12,15 @@ import database as db
 from flask import Flask, jsonify, request
 from werkzeug.security import generate_password_hash
 
-def create_app(test_config=None) -> Flask:
+def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     app = Flask(__name__)
     app.config.from_mapping({"DATABASE": "task_manager.db"})
     
     if test_config:
         app.config.update(test_config)
-    # Non persistent task list used to test CRUD
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    #             NON-PERSISTENT IMPLEMENTATION FOR INITIAL CRUD
     # tasks = [
     #         {"id": 1, "title": "workout", "completed": False},
     #         {"id": 2, "title": "study", "completed": False},
@@ -27,21 +29,18 @@ def create_app(test_config=None) -> Flask:
     #         {"id": 5, "title": "work on mle unit 9", "completed": False},
     #         {"id": 6, "title": "java 1", "completed": False}
     #     ]
-
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     """
                     ~~GET~~
     """
     @app.route("/health", methods=["GET"])
     def health_status():
         """
-        Checks the health of the api connection.
+        Checks the health of the API connection.
 
-        Args: 
-            "/health" - Directory path in the site folder.
-            methods=["GET"] - HTTP method used to retrieve resources from the server
-
-        Returns: JSON of the status with 200 code "successful"
-
+        :param "/health": Directory path in the site folder.
+        :param methods: (optional)["GET"], HTTP method used to retrieve resources from the server.
+        :return: JSON of the status with 200 code "successful".
         """
         return jsonify({"status": "ok"}), 200
 
@@ -51,24 +50,21 @@ def create_app(test_config=None) -> Flask:
         """
         Retrieves all tasks.
 
-        Args: None
-
-        Returns: All tasks
+        :return: All tasks stored in database.
         """
         return jsonify(db.get_tasks_all())
 
 
-    # TODO: Implement with db and include user
+    # TODO: Implement using user_id
     @app.route("/tasks/<int:task_id>", methods=["GET"])
     def get_tasks_by_id(task_id: int):
         """
-        Retrieves an exixting task according to it's id
+        Retrieves an exixting task according to it's id (TASK TABLE).
 
-        Args: task_id: int - id associated with existing task
-
-        Returns: JSON of the full contents of task associated
-                with the id and throws an error if the task
-                doesn't exist
+        :param task_id: int, id associated with existing task.
+        :return: JSON of the full contents of task associated
+            with the id and throws an error if the task doesn't
+            exist.
         """
         task = db.get_tasks_id(task_id)
         if task:
@@ -83,13 +79,10 @@ def create_app(test_config=None) -> Flask:
     @app.route("/tasks", methods=["POST"])
     def add_task():
         """
-        Adds a new task to the list and assigns an id.
+        Adds a new task to the tasks table and assigns an id.
 
-        Args: None
-
-        Returns: JSON of content for newly added task and
-                thorws an error if the task doesn't have
-                a title
+        :return: JSON of content for newly added task,
+            thorws error if the task doesn't have a title.
         """
         data = request.get_json(silent=True) or {}
         if "title" in data:
@@ -104,6 +97,12 @@ def create_app(test_config=None) -> Flask:
     
     @app.route("/signup", methods=["POST"])
     def create_user():
+        """
+        Creates a new user with email and password where
+        the passoword is hashed for secure storage.
+
+        :return: JSON verifiying that user was added successfully.
+        """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
         password = str(data.get("password"))
@@ -124,12 +123,11 @@ def create_app(test_config=None) -> Flask:
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     def update_task(task_id):
         """
-        This funciton updates tasks according to id.
+        Updates tasks according to id.
 
-        Args: task_id: int - id associated with existing task
-
-        Returns: JSON of the full content of task associated with the id
-                if it exists else throw an error
+        :param task_id: int, id associated with existing task.
+        :return: JSON of the full content of task associated with the id
+            if it exists else throw an error.
         """
         data = request.get_json(silent=True) or {}
 
@@ -149,13 +147,11 @@ def create_app(test_config=None) -> Flask:
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
     def remove_task(task_id: int):
         """
-        Removes a task from the list
+        Removes a task from the tasks table in the database.
 
-        Args: task_id: int - id associate with existing task
-        
-        Returns: JSON verifying that the task was sucessfully
-                removed. If tasks doesn't exist, throws an
-                error
+        :param task_id: int, id associate with existing task.
+        :return: JSON verifying that the task was sucessfully
+            removed. If tasks doesn't exist, throws an error.
         """
         if db.remove_tasks(task_id):
             return "", 204
