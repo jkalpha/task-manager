@@ -7,6 +7,7 @@ Date:      2026-07-30
 Description: application built to learn how apis work
 """
 # TODO: Update Docstring for db and not list
+from collections import UserDict
 import database as db
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -18,7 +19,6 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         "DATABASE": "task_manager.db",
         "JWT_SECRET_KEY": "CA92FF703D1FDEA5-CA92FF703D1FDEA5"
         })
-    
     jwt = JWTManager(app)
     
     if test_config:
@@ -59,9 +59,9 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify(db.get_tasks_all())
 
 
-    # TODO: Implement using user_id
-    @app.route("/tasks/<int:task_id>", methods=["GET"])
-    def get_tasks_by_id(task_id: int):
+    # TODO: Update scope for user_id
+    @app.route("/tasks/<int:user_id>", methods=["GET"])
+    def get_tasks_by_user(user_id: int):
         """Retrieves an exixting task according to it's id (TASK TABLE).
 
         :param task_id: int, id associated with existing task.
@@ -69,7 +69,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             with the id and throws an error if the task doesn't
             exist.
         """
-        task = db.get_tasks_id(task_id)
+        task = db.get_tasks_id(user_id)
         if task:
             return jsonify(task), 200
         return jsonify({"error": "Task not found"}), 404
@@ -97,11 +97,13 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             return jsonify(new_task), 201
         return jsonify({"error": "Task need 'title'"}), 400
     
+
+
     @app.route("/signup", methods=["POST"])
     def create_user():
         """Creates a new user with email and password.
 
-        :return: JSON verifiying that user was added successfully.
+        :return: JSON verifying that user was added successfully.
         """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
@@ -137,6 +139,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
                     ~~PUT~~
     """
 
+    # TODO: Update scope for user_id
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     def update_task(task_id):
         """Updates tasks according to id.
@@ -160,6 +163,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
                     ~~DELETE~~
     """
+    # TODO: Update scope for user_id
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
     def remove_task(task_id: int):
         """Removes a task from the tasks table in the database.

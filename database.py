@@ -70,7 +70,7 @@ def get_tasks_all() -> list:
 
     return [dict(row) for row in rows ]
 
-def get_tasks_id(task_id: int) -> list:
+def get_tasks_id(user_id: int) -> list:
     """Retrieves tasks by id from the tasks table.
 
     :param task_id: int, id associated with tasks.
@@ -80,7 +80,7 @@ def get_tasks_id(task_id: int) -> list:
         conn.row_factory = sqweel.Row
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+        cursor.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
 
         rows = cursor.fetchall()
         conn.close()
