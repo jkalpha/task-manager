@@ -120,16 +120,17 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     @app.route("/login", methods=["POST"])
     def login():
         data = request.get_json(silent=True) or {}
-        email = data["email"]
-        password = data["password"]
+        email = data.get("email")
+        password = data.get("password")
+
+        if not email or not password:
+            return jsonify({"error": "Invalid request"}), 400
 
         user = db.get_user_by_email(email)
-        if user:
-            if check_password_hash(user["password_hash"], password):
-                token = create_access_token(identity=user["id"])
-                return jsonify({"access_token": token}), 200
-            else:
-                return jsonify({"error": "Incorrect credentials"}), 401
+        if user and check_password_hash(user["password_hash"], password):
+            token = create_access_token(identity=user["id"])
+            return jsonify({"access_token": token}), 200
+
         return jsonify({"error": "Incorrect credentials"}), 401
         
     """

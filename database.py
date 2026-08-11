@@ -6,7 +6,10 @@ DB_PATH = "task_manager.db"
 
 def connect_db():
     """Helper function that opens the database connection."""
-    return sqweel.connect("task_manager.db")
+    # PRAGMA foreign_keys = ON
+    conn = sqweel.connect("task_manager.db") 
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 def initialize_db() -> None:
     """Initializes schema with tasks and user tables.
@@ -21,9 +24,14 @@ def initialize_db() -> None:
             CREATE TABLE IF NOT EXISTS tasks(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title VARCHAR (50),
-                completed BIT
-            )
+                completed BIT,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+                )
         """)
+
+        # Creates index for better performance
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id)")
+
         # Create users table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users(
@@ -75,6 +83,7 @@ def get_tasks_id(task_id: int) -> list:
         cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
 
         rows = cursor.fetchall()
+        conn.close()
     return [dict(row) for row in rows]
 
 def create_tasks(new_task: dict):
@@ -169,9 +178,12 @@ def get_user_by_email(email):
         (email,)
     )
     row = cursor.fetchone()
+    conn.close()
+
     if row:
         return dict(row)
     return None
 
 if __name__ == "__main__":
     initialize_db()
+
