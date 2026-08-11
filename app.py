@@ -9,17 +9,17 @@ Description: application built to learn how apis work
 # TODO: Update Docstring for db and not list
 import database as db
 from flask import Flask, jsonify, request
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     app = Flask(__name__)
-    jwt = JWTManager(app)
-
     app.config.from_mapping({
         "DATABASE": "task_manager.db",
-        "JWT_SECRET_KEY": "1-2-3-4"
+        "JWT_SECRET_KEY": "CA92FF703D1FDEA5-CA92FF703D1FDEA5"
         })
+    
+    jwt = JWTManager(app)
     
     if test_config:
         app.config.update(test_config)
@@ -116,12 +116,21 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             return jsonify({"status": status}), 201
         return jsonify({"error": "Invalid operation"}), 400
     
-# 1.Look up the user by email (your now-fixed get_user_by_email returning the dict — see, you need the password_hash).
-# 2. If no user → 401. If check_password_hash(user["password_hash"], password) is False → 401.
-# 3. Otherwise create_access_token(identity=user["id"]) → return {"access_token": token} with 200.
 
-    # @app.route("/login", methods=["POST"])
-    # def login(email, password):
+    @app.route("/login", methods=["POST"])
+    def login():
+        data = request.get_json(silent=True) or {}
+        email = data["email"]
+        password = data["password"]
+
+        user = db.get_user_by_email(email)
+        if user:
+            if check_password_hash(user["password_hash"], password):
+                token = create_access_token(identity=user["id"])
+                return jsonify({"access_token": token}), 200
+            else:
+                return jsonify({"error": "Incorrect credentials"}), 401
+        return jsonify({"error": "Incorrect credentials"}), 401
         
     """
                     ~~PUT~~
@@ -159,7 +168,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             removed. If tasks doesn't exist, throws an error.
         """
         if db.remove_tasks(task_id):
-            return jsonify({"status": "task was removed"}), 204
+            return "", 204
         return jsonify({"error": "Task not found"}), 404
     
     return app

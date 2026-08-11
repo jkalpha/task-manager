@@ -158,16 +158,17 @@ def get_user_by_email(email):
     """Checks if a user already exists by email.
 
     :param email: str, email address of the user.
-    :return: user information if user exists else none.
+    :return: dict, user information if user exists else none.
     """
     conn = connect_db()
+    conn.row_factory = sqweel.Row
     cursor = conn.cursor()
+    
     cursor.execute(
         "SELECT * FROM users WHERE email = ?",
         (email,)
     )
     row = cursor.fetchone()
-    # TODO: is there a better way to do this?
     if row:
         return dict(row)
     return None
