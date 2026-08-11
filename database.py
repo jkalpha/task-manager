@@ -155,6 +155,11 @@ def create_user(email, password_hash) -> None:
     conn.close()
 
 def get_user_by_email(email):
+    """Checks if a user already exists by email.
+
+    :param email: str, email address of the user.
+    :return: user information if user exists else none.
+    """
     conn = connect_db()
     cursor = conn.cursor()
     cursor.execute(
