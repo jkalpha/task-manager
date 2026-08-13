@@ -86,7 +86,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON of content for newly added task,
             thorws error if the task doesn't have a title.
         """
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
         if "title" in data:
             new_task = {
@@ -155,7 +155,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON of the full content of task associated with the id
             if it exists else throw an error.
         """
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
 
         if "completed" in data:
@@ -164,11 +164,13 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
                 "id": task_id,
                 "completed": data["completed"]
             }
-            db.update_completion(parse_task)
+            
+            valid = db.update_completion(parse_task)
+            if valid:
+                return jsonify(parse_task), 200
+            return jsonify({"error": "Task not found"}), 404
 
-            return jsonify(parse_task), 200
-
-        return jsonify({"error": "Task not found"}), 404
+        return jsonify({"error": "Malformed JSON"}), 400
 
     """
                     ~~DELETE~~
@@ -183,14 +185,19 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON verifying that the task was sucessfully
             removed. If tasks doesn't exist, throws an error.
         """
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         if db.remove_tasks(task_id=task_id, user_id=user_id):
             return "", 204
         return jsonify({"error": "Task not found"}), 404
     
     return app
-
+"""
+FIX: D2/D3 — GET /tasks (public, returns everything) and GET /tasks/<user_id> (public, trusts a URL param) bypass the scoping you just built.
+        D4 — your live task_manager.db still predates the user_id column; it'll crash on first insert.
+        D5 — DB errors still masquerade as 404s.
+        D6 + minors — response shape, unused imports, 3.11 f-string portability, stale docstrings.
+"""
 
 if __name__ == "__main__":
     app = create_app()

@@ -112,15 +112,20 @@ def update_completion(task: dict):
     :return: Print statement confirming operation was successful.
     """
     conn = connect_db()
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE tasks SET completed = ? WHERE id = ? AND user_id = ?",
+            ((1 if task["completed"] else 0), task["id"], task["user_id"])
+        )
+        conn.commit()
+        return cursor.rowcount > 0
 
-    cursor.execute(
-        "UPDATE tasks SET completed = ? WHERE id = ? AND user_id = ?",
-        ((1 if task["completed"] else 0), task["id"], task["user_id"])
-    )
-    conn.commit()
-    return cursor.rowcount > 0
-    conn.close()
+    except sqweel.Error as error:
+        print(f"An error occured: {error}")
+    
+    finally:    
+        conn.close()
 
 
 def remove_tasks(task_id: int, user_id: int):
