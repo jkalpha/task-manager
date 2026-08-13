@@ -137,7 +137,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         user = db.get_user_by_email(email)
         if user and check_password_hash(user["password_hash"], password):
-            token = create_access_token(identity=user["id"])
+            token = create_access_token(identity=str(user["id"]))
             return jsonify({"access_token": token}), 200
 
         return jsonify({"error": "Incorrect credentials"}), 401

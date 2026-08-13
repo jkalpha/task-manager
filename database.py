@@ -102,7 +102,6 @@ def create_tasks(new_task: dict):
      )
 
     conn.commit()
-    print(f"{new_task["title"]} was added")
     conn.close()
     return cursor.lastrowid
 
@@ -120,6 +119,7 @@ def update_completion(task: dict):
         ((1 if task["completed"] else 0), task["id"], task["user_id"])
     )
     conn.commit()
+    return cursor.rowcount > 0
     conn.close()
 
 
