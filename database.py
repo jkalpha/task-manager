@@ -25,6 +25,7 @@ def initialize_db() -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title VARCHAR (50),
                 completed BIT,
+                user_id INTEGER NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users(id)
                 )
         """)
@@ -96,8 +97,8 @@ def create_tasks(new_task: dict):
     cursor = conn.cursor()
 
     cursor.execute( 
-     "INSERT INTO tasks (title, completed) VALUES (?,?)",
-     (new_task["title"], new_task["completed"]) 
+     "INSERT INTO tasks (user_id, title, completed) VALUES (?,?,?)",
+     (new_task["user_id"], new_task["title"], new_task["completed"]) 
      )
 
     conn.commit()

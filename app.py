@@ -59,15 +59,14 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify(db.get_tasks_all())
 
 
-    # TODO: Update scope for user_id
     @app.route("/tasks/<int:user_id>", methods=["GET"])
     def get_tasks_by_user(user_id: int):
-        """Retrieves an exixting task according to it's id (TASK TABLE).
+        """Retrieves an existing cluster of tasks according to user_id.
 
-        :param task_id: int, id associated with existing task.
-        :return: JSON of the full contents of task associated
-            with the id and throws an error if the task doesn't
-            exist.
+        :param user_id: int, id associated with an existing user.
+        :return: JSON of the full contents of tasks associated
+            with the user_id, throws an error if there's no tasks
+            associated with the user.
         """
         task = db.get_tasks_id(user_id)
         if task:
@@ -144,8 +143,8 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
 
     # TODO: Update scope for user_id
-    @app.route("/tasks/<int:task_id>", methods=["PUT"])
-    def update_task(task_id):
+    @app.route("/tasks/<int:user_id>", methods=["PUT"])
+    def update_task(user_id):
         """Updates tasks according to id.
 
         :param task_id: int, id associated with existing task.
@@ -156,7 +155,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         if "completed" in data:
             parse_task = {
-                "id": task_id,
+                "id": user_id,
                 "completed": data["completed"]
             }
             db.update_completion(parse_task)
