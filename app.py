@@ -147,22 +147,26 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
 
     # TODO: Update scope for user_id
-    @app.route("/tasks/<int:user_id>", methods=["PUT"])
-    def update_task(user_id):
+    @app.route("/tasks", methods=["PUT"])
+    @jwt_required()
+    def update_task():
         """Updates tasks according to id.
 
-        :param task_id: int, id associated with existing task.
+        *:param task_id: int, id associated with existing task.
         :return: JSON of the full content of task associated with the id
             if it exists else throw an error.
         """
+        user_id = get_jwt_identity()
         data = request.get_json(silent=True) or {}
 
         if "completed" in data:
             parse_task = {
-                "id": user_id,
+                "user_id": user_id,
+                "id": data["id"],
                 "completed": data["completed"]
             }
             db.update_completion(parse_task)
+
             return jsonify(parse_task), 200
 
         return jsonify({"error": "Task not found"}), 404

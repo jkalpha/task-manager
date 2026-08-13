@@ -116,13 +116,11 @@ def update_completion(task: dict):
     cursor = conn.cursor()
 
     cursor.execute(
-        "UPDATE tasks SET completed = ? WHERE id = ?",
-        ((1 if task["completed"] else 0), task["id"])
+        "UPDATE tasks SET completed = ? WHERE id = ? AND user_id = ?",
+        ((1 if task["completed"] else 0), task["id"], task["user_id"])
     )
 
     conn.commit()
-    print("UPDATED")
-    print(f"Task: {task["id"]}, completed: {task["completed"]}")
     conn.close()
 
 
