@@ -95,7 +95,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
                 "completed": False
             } 
             new_id = db.create_tasks(new_task)
-            task = f"({new_id}){new_task["title"]} was added."
+            task = f"({new_id}).{new_task["title"]} was added."
 
             return jsonify({"status": task}), 201
         return jsonify({"error": "Malformed JSON"}), 400
@@ -146,10 +146,9 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
                     ~~PUT~~
     """
 
-    # TODO: Update scope for user_id
-    @app.route("/tasks", methods=["PUT"])
+    @app.route("/tasks/<int:task_id>", methods=["PUT"])
     @jwt_required()
-    def update_task():
+    def update_task(task_id: int):
         """Updates tasks according to id.
 
         *:param task_id: int, id associated with existing task.
@@ -162,7 +161,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         if "completed" in data:
             parse_task = {
                 "user_id": user_id,
-                "id": data["id"],
+                "id": task_id,
                 "completed": data["completed"]
             }
             db.update_completion(parse_task)
@@ -174,8 +173,9 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
                     ~~DELETE~~
     """
-    # TODO: Update scope for user_id
+
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
+    @jwt_required()
     def remove_task(task_id: int):
         """Removes a task from the tasks table in the database.
 
@@ -183,7 +183,9 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON verifying that the task was sucessfully
             removed. If tasks doesn't exist, throws an error.
         """
-        if db.remove_tasks(task_id):
+        user_id = get_jwt_identity()
+
+        if db.remove_tasks(task_id=task_id, user_id=user_id):
             return "", 204
         return jsonify({"error": "Task not found"}), 404
     

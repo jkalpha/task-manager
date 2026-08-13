@@ -119,12 +119,11 @@ def update_completion(task: dict):
         "UPDATE tasks SET completed = ? WHERE id = ? AND user_id = ?",
         ((1 if task["completed"] else 0), task["id"], task["user_id"])
     )
-
     conn.commit()
     conn.close()
 
 
-def remove_tasks(task_id: int):
+def remove_tasks(task_id: int, user_id: int):
     """Removes a task from Tasks table.
 
     :param task_id: int, id associated with task.
@@ -134,8 +133,8 @@ def remove_tasks(task_id: int):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "DELETE FROM tasks WHERE id = ?",
-            (task_id,)
+            "DELETE FROM tasks WHERE id = ? AND user_id = ?",
+            (task_id, user_id)
         )
         conn.commit()
         return cursor.rowcount > 0
