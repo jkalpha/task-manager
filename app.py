@@ -121,6 +121,10 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
     @app.route("/login", methods=["POST"])
     def login():
+        """User login by username and password.
+
+        :return: JSON with access token
+        """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
         password = data.get("password")
