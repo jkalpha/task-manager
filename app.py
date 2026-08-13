@@ -79,22 +79,26 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
     # TODO: Handle a missing title and duplicates
     @app.route("/tasks", methods=["POST"])
+    @jwt_required()
     def add_task():
         """Adds a new task to the tasks table and assigns an id.
 
         :return: JSON of content for newly added task,
             thorws error if the task doesn't have a title.
         """
+        user_id = get_jwt_identity()
         data = request.get_json(silent=True) or {}
         if "title" in data:
             new_task = {
-            "title": data["title"],
-            "completed": False
-        }
+                "user_id": user_id,
+                "title": data["title"],
+                "completed": False
+            } 
             new_id = db.create_tasks(new_task)
-            new_task["id"] = new_id
-            return jsonify(new_task), 201
-        return jsonify({"error": "Task need 'title'"}), 400
+            task = f"({new_id}){new_task["title"]} was added."
+
+            return jsonify({"status": task}), 201
+        return jsonify({"error": "Malformed JSON"}), 400
     
 
 
