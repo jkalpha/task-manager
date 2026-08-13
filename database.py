@@ -1,5 +1,5 @@
 import sqlite3 as sqweel
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 #from app import tasks
 
 DB_PATH = "task_manager.db"
@@ -76,14 +76,14 @@ def get_tasks_id(user_id: int) -> list:
     :param task_id: int, id associated with tasks.
     :return: List of dictionaries containing contents of tasks by id.
     """
-    with connect_db() as conn:
-        conn.row_factory = sqweel.Row
-        cursor = conn.cursor()
+    conn = connect_db()
+    conn.row_factory = sqweel.Row
+    cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
+    cursor.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
 
-        rows = cursor.fetchall()
-        conn.close()
+    rows = cursor.fetchall()
+    conn.close()
     return [dict(row) for row in rows]
 
 def create_tasks(new_task: dict):
@@ -186,4 +186,3 @@ def get_user_by_email(email):
 
 if __name__ == "__main__":
     initialize_db()
-

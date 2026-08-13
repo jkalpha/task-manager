@@ -6,7 +6,7 @@ Date:      2026-07-30
 
 Description: application built to learn how apis work
 """
-# TODO: Update Docstring for db and not list
+
 from collections import UserDict
 import database as db
 from flask import Flask, jsonify, request
