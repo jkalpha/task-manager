@@ -41,7 +41,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
     """
-                    ~~GET~~
+    ###############___.~~GET~~.___###############
     """
     @app.route("/health", methods=["GET"])
     def health_status():
@@ -87,7 +87,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         """Adds a new task to the Tasks accoring to the user logged in.
 
         :return: JSON, contents for newly added task, thorws error if 
-            the task doesn't have a title or doesn't exist in db.
+            the task doesn't have a title or doesn't exist in database.
         """
         user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
@@ -146,6 +146,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         return jsonify({"error": "Incorrect credentials"}), 401
         
+        
     """
     ###############___.~~PUT~~.___###############
     """
@@ -155,9 +156,9 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         """Updates tasks according to id where tasks are scoped to the user
             that's logged in.
 
-        *:param task_id: int, id associated with existing task.
-        :return: JSON of the full content of task associated with the id
-            if it exists else throw an error.
+        :param task_id: int, id associated with existing task.
+        :return: JSON, full contents of task associated with the id if it
+            exists else throw an error.
         """
         user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
@@ -171,26 +172,25 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             
             valid = db.update_completion(parse_task)
             if valid:
-                return jsonify(parse_task), 200
+                return jsonify(parse_task), 200    
             return jsonify({"error": "Task not found"}), 404
 
         return jsonify({"error": "Malformed JSON"}), 400
 
-    """
-                    ~~DELETE~~
-    """
 
+    """
+    ###############___.~~DELETE~~.___###############
+    """
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
     @jwt_required()
     def remove_task(task_id: int):
-        """Removes a task from the tasks table in the database.
+        """Removes a task owned by a user.
 
         :param task_id: int, id associate with existing task.
-        :return: JSON verifying that the task was sucessfully
-            removed. If tasks doesn't exist, throws an error.
+        :return: JSON, verification that the task was sucessfully removed.
+            If tasks doesn't exist, throws an error.
         """
         user_id = int(get_jwt_identity())
-
         if db.remove_tasks(task_id=task_id, user_id=user_id):
             return "", 204
         return jsonify({"error": "Task not found"}), 404

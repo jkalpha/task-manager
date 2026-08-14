@@ -1,12 +1,10 @@
 import sqlite3 as sqweel
 # from werkzeug.security import generate_password_hash, check_password_hash
-#from app import tasks
 
 DB_PATH = "task_manager.db"
 
 def connect_db():
     """Helper function that opens the database connection."""
-    # PRAGMA foreign_keys = ON
     conn = sqweel.connect("task_manager.db") 
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
@@ -41,6 +39,7 @@ def initialize_db() -> None:
                 password_hash VARCHAR NOT NULL
             )
         """)
+        
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         #            IMPORTING DATA INTO TABLES TO ADD PERSISTANCE            #
         # for task in tasks:                                                  #
@@ -74,8 +73,8 @@ def get_tasks_all() -> list:
 def get_tasks_id(user_id: int) -> list:
     """Retrieves tasks by id from the tasks table.
 
-    :param task_id: int, id associated with tasks.
-    :return: List of dictionaries containing contents of tasks by id.
+    :param user_id: int, id associated with user.
+    :return: List, dictionaries containing contents of tasks by id.
     """
     conn = connect_db()
     conn.row_factory = sqweel.Row
@@ -88,7 +87,7 @@ def get_tasks_id(user_id: int) -> list:
     return [dict(row) for row in rows]
 
 def create_tasks(new_task: dict):
-    """Inserts a new row in Tasks.
+    """Inserts a new row(task) in Tasks.
 
     :param new_task: Dictonary, contains attibutes to be inserted.
     :return: int, ID associated with the newly created task.
@@ -109,7 +108,7 @@ def update_completion(task: dict):
     """Updates the status of existing task.
 
     :param task: Dictionary, contains attributes of task.
-    :return: Print statement confirming operation was successful.
+    :return: rowcount(int), confirmation that task was changed.
     """
     conn = connect_db()
     try:
@@ -132,7 +131,8 @@ def remove_tasks(task_id: int, user_id: int):
     """Removes a task from Tasks table.
 
     :param task_id: int, id associated with task.
-    :return: int, row count to confirm that task was removed.
+    :param user_id: int, id associated with user.
+    :return: rowcount(int), confirmation that task was removed.
     """
     conn = connect_db()
     try:
@@ -151,10 +151,10 @@ def remove_tasks(task_id: int, user_id: int):
         conn.close()
 
 def create_user(email, password_hash) -> None:
-    """Create a new user.
+    """Creates a new user.
     
     :param email: str, email address of the new user.
-    :param password_hash: str, hashed passowrd of user.
+    :param password_hash: str, hashed passowrd of new user.
     """
     conn = connect_db()
     cursor = conn.cursor()
@@ -166,7 +166,7 @@ def create_user(email, password_hash) -> None:
     conn.commit()
     conn.close()
 
-def get_user_by_email(email):
+def get_user_by_email(email: str):
     """Checks if a user already exists by email.
 
     :param email: str, email address of the user.
