@@ -7,7 +7,10 @@ Date:      2026-07-30
 Description: application built to learn how apis/auth/sessions work
 """
 
+import os
+
 import database as db
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -19,9 +22,10 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     :return: app (obj), fully functioning app.
     """
     app = Flask(__name__)
+    load_dotenv()
     app.config.from_mapping({
         "DATABASE": "task_manager.db",
-        "JWT_SECRET_KEY": "CA92FF703D1FDEA5-CA92FF703D1FDEA5"
+        "JWT_SECRET_KEY": os.getenv('JWT_SECRET_KEY')
         })
     jwt = JWTManager(app)
     
