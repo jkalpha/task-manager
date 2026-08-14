@@ -59,7 +59,6 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     def get_tasks():
         """Retrieves an existing cluster of tasks according to user_id.
 
-        :param user_id: int, id associated with an existing user.
         :return: JSON of the full contents of tasks associated
             with the user_id.
         """
@@ -112,7 +111,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             status = "user successfully created."
             return jsonify({"status": status}), 201
 
-        return jsonify({"error": "Invalid operation"}), 404
+        return jsonify({"error": "Invalid operation"}), 400
     
 
     @app.route("/login", methods=["POST"])
@@ -133,7 +132,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             token = create_access_token(identity=str(user["id"]))
             return jsonify({"access_token": token})
 
-        return jsonify({"error": "Invaild request"}), 404
+        return jsonify({"error": "Unauthorized access"}), 401
         
         
     """
