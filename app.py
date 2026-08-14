@@ -49,25 +49,22 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         :param "/health": Directory path in the site folder.
         :param methods: (optional)["GET"], HTTP method used to retrieve resources from the server.
-        :return: JSON of the status with 200 code "successful".
+        :return: JSON, verification that route is "successful".
         """
-        return jsonify({"status": "ok"}), 200
+        return jsonify({"status": "ok"})
 
 
     @app.route("/tasks", methods=["GET"])
-    def get_tasks_by_user():
+    @jwt_required()
+    def get_tasks():
         """Retrieves an existing cluster of tasks according to user_id.
 
         :param user_id: int, id associated with an existing user.
         :return: JSON of the full contents of tasks associated
-            with the user_id, throws an error if there's no tasks
-            associated with the user.
+            with the user_id.
         """
         user_id = int(get_jwt_identity())
-        task = db.get_tasks_id(user_id)
-        if task:
-            return jsonify({"status": task}), 200
-        return jsonify({"error": "Task not found"}), 404
+        return jsonify(db.get_tasks_id(user_id))
 
 
     """
@@ -134,7 +131,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         user = db.get_user_by_email(email)
         if user and check_password_hash(user["password_hash"], password):
             token = create_access_token(identity=str(user["id"]))
-            return jsonify({"access_token": token}), 200
+            return jsonify({"access_token": token})
 
         return jsonify({"error": "Invaild request"}), 404
         
@@ -164,7 +161,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             
             valid = db.update_completion(parse_task)
             if valid:
-                return jsonify(parse_task), 200    
+                return jsonify(parse_task)
             return jsonify({"error": "Task not found"}), 404
 
         return jsonify({"error": "Malformed JSON"}), 400
