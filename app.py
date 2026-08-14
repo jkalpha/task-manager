@@ -4,16 +4,20 @@ File:      app.py
 Author:    Josiah De Leon
 Date:      2026-07-30
 
-Description: application built to learn how apis work
+Description: application built to learn how apis/auth/sessions work
 """
 
-from collections import UserDict
 import database as db
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
+    """Creates an instance of the applicaiton.
+
+    :param test_config: str, testing configuration for app instance.
+    :return: app (obj), fully functioning app.
+    """
     app = Flask(__name__)
     app.config.from_mapping({
         "DATABASE": "task_manager.db",
@@ -75,16 +79,15 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
 
     """
-                    ~~POST~~
+    ###############___.~~POST~~.___###############
     """
-    # TODO: Handle a missing title and duplicates
     @app.route("/tasks", methods=["POST"])
     @jwt_required()
     def add_task():
-        """Adds a new task to the tasks table and assigns an id.
+        """Adds a new task to the Tasks accoring to the user logged in.
 
-        :return: JSON of content for newly added task,
-            thorws error if the task doesn't have a title.
+        :return: JSON, contents for newly added task, thorws error if 
+            the task doesn't have a title or doesn't exist in db.
         """
         user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
@@ -101,12 +104,11 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify({"error": "Malformed JSON"}), 400
     
 
-
     @app.route("/signup", methods=["POST"])
     def create_user():
         """Creates a new user with email and password.
 
-        :return: JSON verifying that user was added successfully.
+        :return: JSON, verification that user was added successfully.
         """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
@@ -114,11 +116,13 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         
         if email and password:
             if db.get_user_by_email(email):
-                return jsonify({"error": "Email already exits"}), 409
+                return jsonify({"error": "Email already exits."}), 409
+            
             password_hash = generate_password_hash(password)
             db.create_user(email=email, password_hash=password_hash)
-            status = "user successfully created"
+            status = "user successfully created."
             return jsonify({"status": status}), 201
+
         return jsonify({"error": "Invalid operation"}), 400
     
 
@@ -126,7 +130,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     def login():
         """User login by username and password.
 
-        :return: JSON with access token
+        :return: JSON, access token for jwt access.
         """
         data = request.get_json(silent=True) or {}
         email = data.get("email")
@@ -143,13 +147,13 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify({"error": "Incorrect credentials"}), 401
         
     """
-                    ~~PUT~~
+    ###############___.~~PUT~~.___###############
     """
-
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     @jwt_required()
     def update_task(task_id: int):
-        """Updates tasks according to id.
+        """Updates tasks according to id where tasks are scoped to the user
+            that's logged in.
 
         *:param task_id: int, id associated with existing task.
         :return: JSON of the full content of task associated with the id
@@ -192,12 +196,6 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify({"error": "Task not found"}), 404
     
     return app
-"""
-FIX: D2/D3 — GET /tasks (public, returns everything) and GET /tasks/<user_id> (public, trusts a URL param) bypass the scoping you just built.
-        D4 — your live task_manager.db still predates the user_id column; it'll crash on first insert.
-        D5 — DB errors still masquerade as 404s.
-        D6 + minors — response shape, unused imports, 3.11 f-string portability, stale docstrings.
-"""
 
 if __name__ == "__main__":
     app = create_app()

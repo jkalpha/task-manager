@@ -1,4 +1,7 @@
-
-- [x] Docstring
-
-- [ ] work on refactoring `task_id` to `user_id`
+- [ ] docstring
+- [ ] implement all the fixes
+    - [ ] D2/D3 — GET /tasks (public, returns everything) and GET /tasks/<user_id> (public, trusts a URL param) bypass the scoping you just built.
+    - [ ] D4 — your live task_manager.db still predates the user_id column; it'll crash on first insert.
+    - [ ] D5 — DB errors still masquerade as 404s.
+    - [ ] D6 + minors — response shape, unused imports, 3.11 f-string portability, stale docstrings.
+- [ ] complete 100% jwt ownership and login stuff
