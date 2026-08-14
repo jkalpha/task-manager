@@ -63,7 +63,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify(db.get_tasks_all())
 
 
-    @app.route("/tasks/<int:user_id>", methods=["GET"])
+    @app.route("/tasks", methods=["GET"])
     def get_tasks_by_user(user_id: int):
         """Retrieves an existing cluster of tasks according to user_id.
 
@@ -72,9 +72,10 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             with the user_id, throws an error if there's no tasks
             associated with the user.
         """
+        user_id = get_jwt_identity()
         task = db.get_tasks_id(user_id)
         if task:
-            return jsonify(task), 200
+            return jsonify({"status": task}), 200
         return jsonify({"error": "Task not found"}), 404
 
 
@@ -123,7 +124,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             status = "user successfully created."
             return jsonify({"status": status}), 201
 
-        return jsonify({"error": "Invalid operation"}), 400
+        return jsonify({"error": "Invalid operation"}), 404
     
 
     @app.route("/login", methods=["POST"])
@@ -137,14 +138,14 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         password = data.get("password")
 
         if not email or not password:
-            return jsonify({"error": "Invalid request"}), 400
+            return jsonify({"error": "Incorrect credentials"}), 400
 
         user = db.get_user_by_email(email)
         if user and check_password_hash(user["password_hash"], password):
             token = create_access_token(identity=str(user["id"]))
             return jsonify({"access_token": token}), 200
 
-        return jsonify({"error": "Incorrect credentials"}), 401
+        return jsonify({"error": "Invaild request"}), 404
         
         
     """
