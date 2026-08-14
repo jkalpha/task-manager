@@ -55,16 +55,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
 
     @app.route("/tasks", methods=["GET"])
-    def get_tasks():
-        """Retrieves all tasks.
-
-        :return: All tasks stored in database.
-        """
-        return jsonify(db.get_tasks_all())
-
-
-    @app.route("/tasks", methods=["GET"])
-    def get_tasks_by_user(user_id: int):
+    def get_tasks_by_user():
         """Retrieves an existing cluster of tasks according to user_id.
 
         :param user_id: int, id associated with an existing user.
@@ -72,7 +63,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             with the user_id, throws an error if there's no tasks
             associated with the user.
         """
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         task = db.get_tasks_id(user_id)
         if task:
             return jsonify({"status": task}), 200
