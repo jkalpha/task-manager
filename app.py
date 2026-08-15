@@ -27,7 +27,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     
     key = os.getenv('JWT_SECRET_KEY')
     if key is None:
-        raise Exception("JWT key missing.")
+        raise RuntimeError("JWT key missing.")
 
     app.config.from_mapping({
         "DATABASE": "task_manager.db",
@@ -50,9 +50,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     #     ]                                                                 #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-    """
-    ###############___.~~GET~~.___###############
-    """
+    # -- GET --
     @app.route("/health", methods=["GET"])
     def health_status():
         """Checks the health of the API connection.
@@ -73,9 +71,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify(db.get_user_tasks(user_id))
 
 
-    """
-    ###############___.~~POST~~.___###############
-    """
+    # -- POST --
     @app.route("/tasks", methods=["POST"])
     @jwt_required()
     def add_task():
@@ -142,9 +138,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify({"error": "Unauthorized access"}), 401
         
         
-    """
-    ###############___.~~PUT~~.___###############
-    """
+    # -- PUT --
     @app.route("/tasks/<int:task_id>", methods=["PUT"])
     @jwt_required()
     def update_task(task_id: int):
@@ -173,9 +167,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         return jsonify({"error": "Malformed JSON"}), 400
 
 
-    """
-    ###############___.~~DELETE~~.___###############
-    """
+    # -- DELETE --
     @app.route("/tasks/<int:task_id>", methods=["DELETE"])
     @jwt_required()
     def remove_task(task_id: int):

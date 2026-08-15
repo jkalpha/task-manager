@@ -43,9 +43,7 @@ own tasks. Tasks include a title, description, category, and completion status.
 
 - [x] Full user-scoped task CRUD
 
-- [ ] Signup, login, password hashing, and JWT protection
-  - [ ] login + JWT issuance
-  - [ ] protecting routes + ownership
+- [x] Signup, login, password hashing, and JWT protection
 
 - [ ] Input validation and documented error responses
 

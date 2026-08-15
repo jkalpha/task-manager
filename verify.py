@@ -1,3 +1,19 @@
+"""
+Manual verification curls — run against the dev server (python app.py):
+
+    # 1. Unauthenticated GET /tasks -> expect 401
+    curl -i http://127.0.0.1:5000/tasks
+
+    # 2. Login to obtain a token
+    curl -i -X POST http://127.0.0.1:5000/login \
+        -H "Content-Type: application/json" \
+        -d '{"email": "you@example.com", "password": "yourpass"}'
+
+    # 3. Authenticated GET /tasks, using the token from step 2
+    curl -i http://127.0.0.1:5000/tasks \
+        -H "Authorization: Bearer <paste-token-here>"
+"""
+
 from app import create_app
 c = create_app().test_client()
 
