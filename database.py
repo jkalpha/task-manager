@@ -1,5 +1,12 @@
+"""
+task-manager.database
+~~~~~~~~~~~~~~~~~~~~~
+
+This module contains the data handlers for task-manager.
+"""
+
+from typing import Union
 import sqlite3 as sqweel
-# from werkzeug.security import generate_password_hash, check_password_hash
 
 DB_PATH = "task_manager.db"
 
@@ -10,10 +17,7 @@ def connect_db():
     return conn
 
 def initialize_db() -> None:
-    """Initializes schema with tasks and user tables.
-    
-    :return: Tasks and User tables.
-    """
+    """Initializes schema for Tasks and User tables."""
     conn = connect_db()
     try:
         cursor = conn.cursor()
@@ -39,6 +43,7 @@ def initialize_db() -> None:
                 password_hash VARCHAR NOT NULL
             )
         """)
+        conn.commit()
         
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         #            IMPORTING DATA INTO TABLES TO ADD PERSISTANCE            #
@@ -48,7 +53,6 @@ def initialize_db() -> None:
         #         (task["id"], task["title"], int(task["completed"]))         #
         #     )                                                               #
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-        conn.commit()
 
     except sqweel.Error as error:
         print(f"An error occured: {error}")
@@ -56,22 +60,9 @@ def initialize_db() -> None:
     finally:
         conn.close()
 
-def get_tasks_all() -> list:
-    """Retrieves all tasks from the database.
-    
-    :return: List of dictionaries containing contents of tasks.
-    """
-    with connect_db() as conn:
-        conn.row_factory = sqweel.Row
-        cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM tasks")
-        rows = cursor.fetchall()
-
-    return [dict(row) for row in rows ]
-
-def get_tasks_id(user_id: int) -> list:
-    """Retrieves tasks by id from the tasks table.
+def get_user_tasks(user_id: int) -> list:
+    """Retrieves tasks by user_id from Tasks.
 
     :param user_id: int, id associated with user.
     :return: List, dictionaries containing contents of tasks by id.
@@ -80,35 +71,40 @@ def get_tasks_id(user_id: int) -> list:
     conn.row_factory = sqweel.Row
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,))
-
+    cursor.execute(
+        "SELECT * FROM tasks WHERE user_id = ?",
+        (user_id,)
+    )
     rows = cursor.fetchall()
     conn.close()
+
     return [dict(row) for row in rows]
+
 
 def create_tasks(new_task: dict):
     """Inserts a new row(task) in Tasks.
 
     :param new_task: Dictonary, contains attibutes to be inserted.
-    :return: int, ID associated with the newly created task.
+    :return: int, task_id associated with the newly created task.
     """
     conn = connect_db()
     cursor = conn.cursor()
 
-    cursor.execute( 
-     "INSERT INTO tasks (user_id, title, completed) VALUES (?,?,?)",
-     (new_task["user_id"], new_task["title"], new_task["completed"]) 
-     )
-
+    cursor.execute(
+        "INSERT INTO tasks (user_id, title, completed) VALUES (?,?,?)",
+        (new_task["user_id"], new_task["title"], new_task["completed"])
+    )
     conn.commit()
     conn.close()
+
     return cursor.lastrowid
+
 
 def update_completion(task: dict):
     """Updates the status of existing task.
 
     :param task: Dictionary, contains attributes of task.
-    :return: rowcount(int), confirmation that task was changed.
+    :return: rowcount(int), confirmation that status was changed.
     """
     conn = connect_db()
     try:
@@ -128,7 +124,7 @@ def update_completion(task: dict):
 
 
 def remove_tasks(task_id: int, user_id: int):
-    """Removes a task from Tasks table.
+    """Removes a task associated with a user from Tasks table.
 
     :param task_id: int, id associated with task.
     :param user_id: int, id associated with user.
@@ -150,7 +146,7 @@ def remove_tasks(task_id: int, user_id: int):
     finally:
         conn.close()
 
-def create_user(email, password_hash) -> None:
+def create_user(email: str, password_hash) -> None:
     """Creates a new user.
     
     :param email: str, email address of the new user.
@@ -166,7 +162,8 @@ def create_user(email, password_hash) -> None:
     conn.commit()
     conn.close()
 
-def get_user_by_email(email: str):
+
+def get_user_by_email(email: str) -> Union[dict, None]:
     """Checks if a user already exists by email.
 
     :param email: str, email address of the user.

@@ -65,7 +65,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON, full contents of tasks associated with the user_id.
         """
         user_id = int(get_jwt_identity())
-        return jsonify(db.get_tasks_id(user_id))
+        return jsonify(db.get_user_tasks(user_id))
 
 
     """
