@@ -80,21 +80,39 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON, contents for newly added task, thorws error if 
             the task doesn't have a title or doesn't exist in database.
         """
+        # TODO: Implement appropriate errors
+        # ----------------------------------
+        # 1.body isn't valid JSON / wrong Content-Type
+        # 2.required key missing
+        # 3.wrong datatype
+        # 4.empty string
+        
         user_id = int(get_jwt_identity())
-        data = request.get_json(silent=True) or {}
-        if "title" in data:
+        data = request.get_json(silent=True)
+
+        if data is None:
+            return jsonify({"error": "Request body must be valid JSON."}), 400
+        elif not isinstance(data, dict):
+            return jsonify({"error": "Request body must be a dictionary."}), 400
+        elif "title" not in data:
+            return jsonify({"error": "title is required."}), 400
+        elif not isinstance(data["title"], str):
+            return jsonify({"error": "title has to be string."}), 400
+        elif not data["title"]:
+            return jsonify({"error": "title cannot be empty"}), 400
+        else:
             new_task = {
                 "user_id": user_id,
                 "title": data["title"],
                 "completed": False
             } 
+
             new_id = db.create_tasks(new_task)
             task = f"({new_id}).{new_task["title"]} was added."
 
             return jsonify({"status": task}), 201
-        return jsonify({"error": "Malformed JSON"}), 400
-    
 
+    
     @app.route("/signup", methods=["POST"])
     def create_user():
         """Creates a new user with email and password.
