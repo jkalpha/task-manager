@@ -24,9 +24,14 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     """
     app = Flask(__name__)
     load_dotenv()
+    
+    key = os.getenv('JWT_SECRET_KEY')
+    if key is None:
+        raise Exception("JWT key missing.")
+
     app.config.from_mapping({
         "DATABASE": "task_manager.db",
-        "JWT_SECRET_KEY": os.getenv('JWT_SECRET_KEY')
+        "JWT_SECRET_KEY": key
         })
     jwt = JWTManager(app)
     
