@@ -80,13 +80,6 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         :return: JSON, contents for newly added task, thorws error if 
             the task doesn't have a title or doesn't exist in database.
         """
-        # TODO: Implement appropriate errors
-        # ----------------------------------
-        # 1.body isn't valid JSON / wrong Content-Type
-        # 2.required key missing
-        # 3.wrong datatype
-        # 4.empty string
-        
         user_id = int(get_jwt_identity())
         data = request.get_json(silent=True)
 
@@ -98,12 +91,12 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             return jsonify({"error": "title is required."}), 400
         elif not isinstance(data["title"], str):
             return jsonify({"error": "title has to be string."}), 400
-        elif not data["title"]:
+        elif data["title"].strip() == "":
             return jsonify({"error": "title cannot be empty"}), 400
         else:
             new_task = {
                 "user_id": user_id,
-                "title": data["title"],
+                "title": data["title"].strip(),
                 "completed": False
             } 
 
