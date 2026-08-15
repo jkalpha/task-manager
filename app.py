@@ -16,9 +16,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
-    """Creates an instance of the applicaiton.
+    """Creates an instance of the application.
 
-    :param test_config: str, testing configuration for app instance.
+    :param test_config: dictionary (optional), testing configuration for app
+        instance.
     :return: app (obj), fully functioning app.
     """
     app = Flask(__name__)
@@ -51,9 +52,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     def health_status():
         """Checks the health of the API connection.
 
-        :param "/health": Directory path in the site folder.
-        :param methods: (optional)["GET"], HTTP method used to retrieve resources from the server.
-        :return: JSON, verification that route is "successful".
+        :return: JSON, verification that route is successful.
         """
         return jsonify({"status": "ok"})
 
@@ -63,8 +62,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     def get_tasks():
         """Retrieves an existing cluster of tasks according to user_id.
 
-        :return: JSON of the full contents of tasks associated
-            with the user_id.
+        :return: JSON, full contents of tasks associated with the user_id.
         """
         user_id = int(get_jwt_identity())
         return jsonify(db.get_tasks_id(user_id))
@@ -76,7 +74,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
     @app.route("/tasks", methods=["POST"])
     @jwt_required()
     def add_task():
-        """Adds a new task to the Tasks accoring to the user logged in.
+        """Adds a new task to the Tasks according to the user logged in.
 
         :return: JSON, contents for newly added task, thorws error if 
             the task doesn't have a title or doesn't exist in database.
@@ -150,7 +148,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         :param task_id: int, id associated with existing task.
         :return: JSON, full contents of task associated with the id if it
-            exists else throw an error.
+            exists else throws an error.
         """
         user_id = int(get_jwt_identity())
         data = request.get_json(silent=True) or {}
