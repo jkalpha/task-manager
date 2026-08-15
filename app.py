@@ -112,20 +112,27 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
 
         :return: JSON, verification that user was added successfully.
         """
-        data = request.get_json(silent=True) or {}
+        data = request.get_json(silent=True)
+        
+        if data is None:
+            return jsonify({"error": "Request body must be valid JSON."}), 400
+        elif not isinstance(data, dict):
+            return jsonify({"error": "Request body must be a dictionary."}), 400
+        elif "email" and "password" not in data:
+            return jsonify({"error": "Required fields are missing."}), 400
+
         email = data.get("email")
         password = data.get("password")
-        
+
         if email and password:
             if db.get_user_by_email(email):
-                return jsonify({"error": "Email already exits."}), 409
+                return jsonify({"error": "Email already exits."}), 404
             
             password_hash = generate_password_hash(password)
             db.create_user(email=email, password_hash=password_hash)
             status = "user successfully created."
-            return jsonify({"status": status}), 201
-
-        return jsonify({"error": "Invalid operation"}), 400
+        
+        return jsonify({"status": status}), 201
     
 
     @app.route("/login", methods=["POST"])
@@ -161,21 +168,27 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             exists else throws an error.
         """
         user_id = int(get_jwt_identity())
-        data = request.get_json(silent=True) or {}
+        data = request.get_json(silent=True)
 
-        if "completed" in data:
-            parse_task = {
-                "user_id": user_id,
-                "id": task_id,
-                "completed": data["completed"]
-            }
-            
-            valid = db.update_completion(parse_task)
-            if valid:
-                return jsonify(parse_task)
-            return jsonify({"error": "Task not found"}), 404
+        if data is None:
+            return jsonify({"error": "Request body must be valid JSON."}), 400
+        elif not isinstance(data, dict):
+            return jsonify({"error": "Request body must be valid JSON."}), 400
+        elif "completed" not in data:
+            return jsonify({"error": "Required fields are missing."}), 400
+        elif not isinstance(data["completed"], bool):
+            return jsonify({"error": "completed must be a boolean value."}), 400
 
-        return jsonify({"error": "Malformed JSON"}), 400
+        parse_task = {
+            "user_id": user_id,
+            "id": task_id,
+            "completed": data["completed"]
+        }
+        
+        valid = db.update_completion(parse_task)
+        if valid:
+            return jsonify(parse_task)
+        return jsonify({"error": "Task not found"}), 404
 
 
     # -- DELETE --

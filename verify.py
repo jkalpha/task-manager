@@ -33,8 +33,11 @@ def add_user_task():
     assert resp.json is not None, "login returned no body"
     token = resp.json.get("access_token")
 
+    r1 = c.post("/tasks", json={"title": "test"}, headers={"Authorization": f"Bearer {token}"})
+    assert r1.status_code == 201, r1.json
+
     r2 = c.post("/tasks", json={"title": "   "}, headers={"Authorization": f"Bearer {token}"})
-    assert r2.status_code == 200, r2.json
+    assert r2.status_code == 400, r2.json
 
 
 add_user_task()
