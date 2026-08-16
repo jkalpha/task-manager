@@ -93,6 +93,8 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             return jsonify({"error": "title has to be string."}), 400
         elif data["title"].strip() == "":
             return jsonify({"error": "title cannot be empty"}), 400
+        elif db.get_single_task(data["title"].strip(), user_id) != []:
+            return jsonify({"error": "task already exists"}), 400
         else:
             new_task = {
                 "user_id": user_id,
@@ -118,21 +120,30 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
             return jsonify({"error": "Request body must be valid JSON."}), 400
         elif not isinstance(data, dict):
             return jsonify({"error": "Request body must be a dictionary."}), 400
-        elif "email" and "password" not in data:
+        elif "email" not in data or "password" not in data:
             return jsonify({"error": "Required fields are missing."}), 400
+        elif not isinstance(data["email"], str) or not isinstance(data["password"], str):
+            return jsonify({"error": "Fields contain unsupported datatypes."}), 400
+        elif data["email"].strip() == "" or data["password"].strip() =="":
+            return jsonify({"error": "Fields cannot be empty."}), 400
+        elif len(data["password"]) < 8:
+            return jsonify({"error": "Password has to be longer than 8 letters."}), 400
+        elif not db.is_valid_email(data["email"]):
+            return jsonify({"error": "Invalid email address."}), 400
 
         email = data.get("email")
         password = data.get("password")
 
         if email and password:
             if db.get_user_by_email(email):
-                return jsonify({"error": "Email already exits."}), 404
-            
+                return jsonify({"error": "Email already exists."}), 409
+        
             password_hash = generate_password_hash(password)
             db.create_user(email=email, password_hash=password_hash)
             status = "user successfully created."
-        
-        return jsonify({"status": status}), 201
+            return jsonify({"status": status}), 201
+        else:
+            return jsonify({"error": "Invalid request."}), 400
     
 
     @app.route("/login", methods=["POST"])
@@ -173,7 +184,7 @@ def create_app(test_config=None) -> Flask: # App factory for dynamic sessions
         if data is None:
             return jsonify({"error": "Request body must be valid JSON."}), 400
         elif not isinstance(data, dict):
-            return jsonify({"error": "Request body must be valid JSON."}), 400
+            return jsonify({"error": "Request body must be valid dictionary."}), 400
         elif "completed" not in data:
             return jsonify({"error": "Required fields are missing."}), 400
         elif not isinstance(data["completed"], bool):

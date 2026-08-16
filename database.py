@@ -7,6 +7,8 @@ This module contains the data handlers for task-manager.
 
 from typing import Union
 import sqlite3 as sqweel
+import re
+
 
 DB_PATH = "task_manager.db"
 
@@ -15,6 +17,7 @@ def connect_db():
     conn = sqweel.connect("task_manager.db") 
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
+
 
 def initialize_db() -> None:
     """Initializes schema for Tasks and User tables."""
@@ -59,6 +62,21 @@ def initialize_db() -> None:
 
     finally:
         conn.close()
+
+
+def get_single_task(title: str, user_id: int):
+    conn = connect_db()
+    conn.row_factory = sqweel.Row
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM tasks WHERE title = ? AND user_id = ?",
+        (title, user_id)
+    )
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [dict(row) for row in rows]
 
 
 def get_user_tasks(user_id: int) -> list:
@@ -146,6 +164,7 @@ def remove_tasks(task_id: int, user_id: int):
     finally:
         conn.close()
 
+
 def create_user(email: str, password_hash) -> None:
     """Creates a new user.
     
@@ -183,6 +202,10 @@ def get_user_by_email(email: str) -> Union[dict, None]:
     if row:
         return dict(row)
     return None
+
+def is_valid_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return re.match(pattern, email) is not None
 
 if __name__ == "__main__":
     initialize_db()
